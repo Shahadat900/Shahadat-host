@@ -21,64 +21,86 @@ echo ""
 echo "===================================="
 echo ""
 
-read -p "Select Option: " option
+read -p "Choose Option: " option
 
 case $option in
 
 1)
 clear
-echo "Starting MariaDB..."
-mysqld_safe > /dev/null 2>&1 &
 
-sleep 3
+echo "Start PHP Server"
+echo ""
 
-if [ -f runpath.txt ]; then
-path=$(cat runpath.txt)
-else
-path=$HOME/www
+# Default path = current directory
+read -p "Enter File Path [default: current]: " path
+
+if [ -z "$path" ]; then
+path=$(pwd)
+fi
+
+# Default port = 8080
+read -p "Enter Port [default:8080]: " port
+
+if [ -z "$port" ]; then
+port=8080
 fi
 
 echo ""
-echo "Running PHP Server..."
-echo "Project Path: $path"
+echo "Checking project files..."
+
+# Auto detect index file
+if [ -f "$path/index.php" ]; then
+index="index.php"
+elif [ -f "$path/index.html" ]; then
+index="index.html"
+else
+index=""
+fi
+
 echo ""
-echo "Open Browser:"
-echo "http://localhost:8000"
+echo "Starting MariaDB..."
+mysqld_safe > /dev/null 2>&1 &
+
+sleep 2
+
+echo ""
+echo "===================================="
+echo "Server Started Successfully"
+echo "===================================="
+echo ""
+echo "Project Path : $path"
+echo "Port         : $port"
 echo ""
 
-php -S localhost:8000 -t $path
+if [ -n "$index" ]; then
+echo "▶ Hosted at: http://localhost:$port/$index"
+else
+echo "▶ Hosted at: http://localhost:$port"
+fi
+
+echo ""
+echo "Press CTRL + C to stop server"
+echo ""
+
+php -S localhost:$port -t "$path"
 ;;
 
 2)
-clear
 pkill mysqld
 pkill php
-echo ""
-echo "Server stopped successfully"
+echo "Server stopped"
 ;;
 
 3)
-clear
 bash db.sh
 ;;
 
 4)
-clear
 bash filemanager.sh
 ;;
 
 5)
-clear
-echo "Enter new PHP project path"
-echo "Example: /data/data/com.termux/files/home/www"
-
-read newpath
-
-echo $newpath > runpath.txt
-
-echo ""
-echo "New run path saved:"
-echo $newpath
+echo "Feature reserved for future version"
 ;;
 
 6)
@@ -87,7 +109,6 @@ echo "Server Status"
 echo "-------------"
 
 ps aux | grep mysqld | grep -v grep > /dev/null
-
 if [ $? -eq 0 ]; then
 echo "MariaDB: Running"
 else
@@ -95,7 +116,6 @@ echo "MariaDB: Stopped"
 fi
 
 ps aux | grep php | grep -v grep > /dev/null
-
 if [ $? -eq 0 ]; then
 echo "PHP Server: Running"
 else
