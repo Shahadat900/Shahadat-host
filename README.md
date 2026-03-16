@@ -19,9 +19,9 @@ Installation
 
 Clone repo
 
-git clone https://github.com/username/shahadat-host
+git clone https://github.com/Shahadat900/Shahadat-host.git
 
-cd shahadat-host
+cd Shahadat-host
 
 chmod +x *
 
