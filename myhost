@@ -1,0 +1,116 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+clear
+
+while true
+do
+
+echo ""
+echo "===================================="
+echo "          Shahadat Host"
+echo "===================================="
+echo ""
+echo "1  Start PHP Server"
+echo "2  Stop Server"
+echo "3  Database Manager"
+echo "4  File Manager"
+echo "5  Change PHP Run Path"
+echo "6  Server Status"
+echo "0  Exit"
+echo ""
+echo "===================================="
+echo ""
+
+read -p "Select Option: " option
+
+case $option in
+
+1)
+clear
+echo "Starting MariaDB..."
+mysqld_safe > /dev/null 2>&1 &
+
+sleep 3
+
+if [ -f runpath.txt ]; then
+path=$(cat runpath.txt)
+else
+path=$HOME/www
+fi
+
+echo ""
+echo "Running PHP Server..."
+echo "Project Path: $path"
+echo ""
+echo "Open Browser:"
+echo "http://localhost:8000"
+echo ""
+
+php -S localhost:8000 -t $path
+;;
+
+2)
+clear
+pkill mysqld
+pkill php
+echo ""
+echo "Server stopped successfully"
+;;
+
+3)
+clear
+bash db.sh
+;;
+
+4)
+clear
+bash filemanager.sh
+;;
+
+5)
+clear
+echo "Enter new PHP project path"
+echo "Example: /data/data/com.termux/files/home/www"
+
+read newpath
+
+echo $newpath > runpath.txt
+
+echo ""
+echo "New run path saved:"
+echo $newpath
+;;
+
+6)
+clear
+echo "Server Status"
+echo "-------------"
+
+ps aux | grep mysqld | grep -v grep > /dev/null
+
+if [ $? -eq 0 ]; then
+echo "MariaDB: Running"
+else
+echo "MariaDB: Stopped"
+fi
+
+ps aux | grep php | grep -v grep > /dev/null
+
+if [ $? -eq 0 ]; then
+echo "PHP Server: Running"
+else
+echo "PHP Server: Stopped"
+fi
+;;
+
+0)
+exit
+;;
+
+*)
+echo "Invalid option"
+;;
+
+esac
+
+done
